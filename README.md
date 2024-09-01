@@ -23,8 +23,3 @@ g++ two_sum_solution.cpp -o two_sum_solution
 ./two_sum_solution
 ```
 
-## License
-This project is licensed under the MIT License. See the LICENSE file for details.
-
-## Author
-[Your Name]
