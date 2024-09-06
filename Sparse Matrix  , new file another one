@@ -1,4 +1,6 @@
-#include <iostream>
+```cpp
+// C++ code goes here
+
 #include <vector>
 #include <stdexcept>  // For exception handling
 using namespace std;
