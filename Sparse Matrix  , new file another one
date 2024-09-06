@@ -1,0 +1,160 @@
+#include <iostream>
+#include <vector>
+#include <stdexcept>  // For exception handling
+using namespace std;
+
+const int MAX_SIZE = 1000;
+
+// Structure to represent a sparse matrix element
+struct SparseMatrix {
+    int row;
+    int col;
+    int value;
+};
+
+// Function to display the sparse matrix
+void displaySparseMatrix(const vector<SparseMatrix>& sm) {
+    if (sm.empty()) {
+        cout << "The sparse matrix is empty or all elements are zero." << endl;
+    } else {
+        cout << "Sparse Matrix Representation: (row, col, value)" << endl;
+        for (const auto& elem : sm) {
+            cout << "(" << elem.row << ", " << elem.col << ", " << elem.value << ")" << endl;
+        }
+    }
+}
+
+// Function to accept user input for a matrix
+vector<vector<int>> getUserMatrixInput(int& rows, int& cols) {
+    cout << "Enter number of rows and columns (positive integers only, max size " << MAX_SIZE << "): ";
+    cin >> rows >> cols;
+
+    // Validate matrix size
+    if (rows <= 0 || cols <= 0 || rows > MAX_SIZE || cols > MAX_SIZE) {
+        throw runtime_error("Matrix dimensions must be positive integers and less than or equal to " + to_string(MAX_SIZE) + ".");
+    }
+
+    vector<vector<int>> matrix(rows, vector<int>(cols, 0));
+    cout << "Enter the elements of the matrix (only integers):" << endl;
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            cin >> matrix[i][j];
+        }
+    }
+
+    return matrix;
+}
+
+// Convert a matrix to its sparse representation
+vector<SparseMatrix> toSparseMatrix(const vector<vector<int>>& matrix, int rows, int cols) {
+    vector<SparseMatrix> sparse;
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            if (matrix[i][j] != 0) {
+                sparse.push_back({i, j, matrix[i][j]});
+            }
+        }
+    }
+    return sparse;
+}
+
+// Function to add two sparse matrices
+vector<SparseMatrix> addSparseMatrices(const vector<SparseMatrix>& sm1, const vector<SparseMatrix>& sm2, int rows, int cols) {
+    vector<vector<int>> result(rows, vector<int>(cols, 0));
+
+    // Add first matrix
+    for (const auto& elem : sm1) {
+        result[elem.row][elem.col] += elem.value;
+    }
+
+    // Add second matrix
+    for (const auto& elem : sm2) {
+        result[elem.row][elem.col] += elem.value;
+    }
+
+    // Convert the result to sparse matrix representation
+    return toSparseMatrix(result, rows, cols);
+}
+
+// Function to multiply two sparse matrices
+vector<SparseMatrix> multiplySparseMatrices(const vector<SparseMatrix>& sm1, const vector<SparseMatrix>& sm2, int rows1, int cols1, int rows2, int cols2) {
+    if (cols1 != rows2) {
+        cout << "Matrix multiplication not possible. Invalid dimensions." << endl;
+        return {};
+    }
+
+    vector<vector<int>> result(rows1, vector<int>(cols2, 0));
+
+    // Convert sm2 into normal matrix form for multiplication
+    vector<vector<int>> matrix2(rows2, vector<int>(cols2, 0));
+    for (const auto& elem : sm2) {
+        matrix2[elem.row][elem.col] = elem.value;
+    }
+
+    // Multiply matrices
+    for (const auto& elem1 : sm1) {
+        for (int k = 0; k < cols2; k++) {
+            result[elem1.row][k] += elem1.value * matrix2[elem1.col][k];
+        }
+    }
+
+    // Convert the result to sparse matrix representation
+    return toSparseMatrix(result, rows1, cols2);
+}
+
+// Function to transpose a sparse matrix
+vector<SparseMatrix> transposeSparseMatrix(const vector<SparseMatrix>& sm) {
+    vector<SparseMatrix> transposed;
+    for (const auto& elem : sm) {
+        transposed.push_back({elem.col, elem.row, elem.value});
+    }
+    return transposed;
+}
+
+int main() {
+    try {
+        int rows1, cols1, rows2, cols2;
+        cout << "Sparse Matrix Operations!" << endl;
+
+        // User input for matrix 1
+        vector<vector<int>> matrix1 = getUserMatrixInput(rows1, cols1);
+        vector<SparseMatrix> sm1 = toSparseMatrix(matrix1, rows1, cols1);
+
+        // User input for matrix 2
+        vector<vector<int>> matrix2 = getUserMatrixInput(rows2, cols2);
+        vector<SparseMatrix> sm2 = toSparseMatrix(matrix2, rows2, cols2);
+
+        // Display sparse matrices
+        cout << "\nSparse Matrix 1:" << endl;
+        displaySparseMatrix(sm1);
+
+        cout << "\nSparse Matrix 2:" << endl;
+        displaySparseMatrix(sm2);
+
+        // Matrix addition
+        if (rows1 == rows2 && cols1 == cols2) {
+            vector<SparseMatrix> additionResult = addSparseMatrices(sm1, sm2, rows1, cols1);
+            cout << "\nAddition Result:" << endl;
+            displaySparseMatrix(additionResult);
+        } else {
+            cout << "\nMatrix addition not possible due to dimension mismatch." << endl;
+        }
+
+        // Matrix multiplication
+        vector<SparseMatrix> multiplicationResult = multiplySparseMatrices(sm1, sm2, rows1, cols1, rows2, cols2);
+        if (!multiplicationResult.empty()) {
+            cout << "\nMultiplication Result:" << endl;
+            displaySparseMatrix(multiplicationResult);
+        }
+
+        // Matrix transpose
+        vector<SparseMatrix> transposeResult = transposeSparseMatrix(sm1);
+        cout << "\nTranspose of Matrix 1:" << endl;
+        displaySparseMatrix(transposeResult);
+
+    } catch (const exception& e) {
+        cerr << "Error: " << e.what() << endl;
+    }
+
+    return 0;
+}
