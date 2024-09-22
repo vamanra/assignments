@@ -75,18 +75,24 @@ public:
         return {INT_MAX, vector<char>()}; // Return no path if unreachable
     }
 };
-
 int main() {
     Graph g;
 
-    // Hardcoded graph from the example
+    // Adding edges for an undirected graph
     g.addEdge('A', 'B', 10);
+    g.addEdge('B', 'A', 10); // Reverse direction
     g.addEdge('A', 'E', 3);
+    g.addEdge('E', 'A', 3); // Reverse direction
     g.addEdge('E', 'B', 1);
+    g.addEdge('B', 'E', 1); // Reverse direction
     g.addEdge('E', 'C', 4);
+    g.addEdge('C', 'E', 4); // Reverse direction
     g.addEdge('B', 'C', 2);
+    g.addEdge('C', 'B', 2); // Reverse direction
     g.addEdge('C', 'D', 2);
+    g.addEdge('D', 'C', 2); // Reverse direction
     g.addEdge('B', 'D', 7);
+    g.addEdge('D', 'B', 7); // Reverse direction
 
     char start, end;
     cout << "Enter start node: ";
